@@ -3,6 +3,7 @@
 console.log('Hello jQuery!');
 
 $(document).ready(function () {
+
   function addSpeakersjQuery (speakers) {
     $.each (speakers, function (index, speaker) {
       let tbody = $('#speakers-tbody');
@@ -20,7 +21,8 @@ $(document).ready(function () {
     });
   }
 
-  $.getJSON('json/speaker.json',
+  $.getJSON('http://localhost:5000/speakers',
     (data) => addSpeakersjQuery(data.speakers)
   );
+
 });
