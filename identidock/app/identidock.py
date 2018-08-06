@@ -1,8 +1,12 @@
 import hashlib
+from time import sleep
+
 from flask import Flask, Response, request
+import redis
 import requests
 
 app = Flask(__name__)
+cache = redis.StrictRedis("redis", port=6379)
 SALT = "salt"
 
 
@@ -29,8 +33,13 @@ def main_page():
 
 @app.route("/monster/<name>")
 def get_identicon(name):
-    r = requests.get('http://dnmonster:8080/monster/' + name + '?size=80')
-    return Response(r.content, mimetype="image/png")
+    image = cache.get(name)
+    if image is None:
+        sleep(3)
+        r = requests.get('http://dnmonster:8080/monster/' + name + '?size=80')
+        image = r.content
+        cache.set(name, image)
+    return Response(image, mimetype="image/png")
 
 
 if __name__ == "__main__":
