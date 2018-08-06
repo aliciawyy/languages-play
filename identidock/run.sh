@@ -1,3 +1,3 @@
-#! /bin/sh
+#!/bin/bash
 
-docker run -P -v "$PWD"/app:/app identidock
+docker run -P -e ENV="PROD" -v "$PWD"/app:/app identidock
