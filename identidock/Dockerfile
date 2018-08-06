@@ -6,5 +6,11 @@ COPY requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
 
 WORKDIR /app
+
+EXPOSE 9090 9191
+
+RUN groupadd -r uwsgi && useradd -rg uwsgi uwsgi
+USER uwsgi
+
 CMD ["uwsgi", "--http", "0.0.0.0:9090", "--wsgi-file", "/app/identidock.py", \
      "--callable", "app", "--stats", "0.0.0.0:9191"]
