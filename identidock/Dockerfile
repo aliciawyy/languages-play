@@ -1,9 +1,7 @@
-FROM python:3.6
+FROM python:3.6-slim
 
 COPY requirements.txt /tmp/requirements.txt
 RUN pip install -r /tmp/requirements.txt
 
 WORKDIR /app
-COPY app /app
-
 CMD ["python", "identidock.py"]
