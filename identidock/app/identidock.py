@@ -1,12 +1,18 @@
-from flask import Flask, Response
+import hashlib
+from flask import Flask, Response, request
 import requests
 
 app = Flask(__name__)
+SALT = "salt"
 
 
-@app.route("/")
-def mainpage():
+@app.route("/", methods=["GET", "POST"])
+def main_page():
     name = "Joe Bloggs"
+    if request.method == "POST":
+        name = request.form["name"]
+
+    hashed_name = hashlib.sha256((SALT + name).encode()).hexdigest()
 
     header = '<html><head><title>Identidock</title></head><body>'
     body = '''
@@ -15,8 +21,8 @@ def mainpage():
       <input type="submit" value="submit">
       </form>
       <p>You look like a:
-      <img src="/monster/monster.png"/>
-      '''.format(name)
+      <img src="/monster/{}"/>
+      '''.format(name, hashed_name)
     footer = '</body></html>'
     return header + body + footer
 
