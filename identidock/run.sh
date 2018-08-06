@@ -1,3 +1,3 @@
 #! /bin/sh
 
-docker run -d -p 5000:5000 -v "$PWD"/app:/app identidock
+docker run -p 9090:9090 -p 9191:9191 -v "$PWD"/app:/app identidock
