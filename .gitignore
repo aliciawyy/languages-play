@@ -4,3 +4,7 @@ node_modules
 *.tmp
 *bower_components
 *test/bower_components
+
+identidock/\.pytest_cache/
+
+identidock/app/tests/\.pytest_cache/

@@ -1,4 +1,5 @@
 import hashlib
+import html
 from time import sleep
 
 from flask import Flask, Response, request
@@ -15,6 +16,7 @@ def main_page():
     name = "Joe Bloggs"
     if request.method == "POST":
         name = request.form["name"]
+        name = html.escape(name, quote=True)
 
     hashed_name = hashlib.sha256((SALT + name).encode()).hexdigest()
 
