@@ -2,6 +2,14 @@ const express = require('express');
 const path = require('path');
 const app = express();
 
+const fortunes = [
+  "Conquer your fears or they will conquer you.",
+  "Rivers need springs.",
+  "Do not fear what you don't know.",
+  "You will have a pleasant surprise.",
+  "Whenever possible, keep it simple.",
+];
+
 /* HTML templating framework */
 const handlebars = require('express3-handlebars').create(
   { defaultLayout: 'main' }
@@ -10,6 +18,8 @@ app.engine('handlebars', handlebars.engine);
 app.set('views', path.join(__dirname, 'views/layouts/'));
 app.set('view engine', 'handlebars');
 
+app.use(express.static(__dirname + '/public'));
+
 app.set('port', process.env.PORT || 3000);
 
 app.get('/', (req, res) => {
@@ -17,7 +27,8 @@ app.get('/', (req, res) => {
 });
 
 app.get('/about', (req, res) => {
-  res.render('about');
+  let fortuneIndex = Math.floor(Math.random()) * fortunes.length;
+  res.render('about', { fortune: fortunes[fortuneIndex] });
 });
 
 app.use((req, res) => {
