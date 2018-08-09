@@ -1,7 +1,24 @@
 const express = require('express');
 const app = express();
 
+/* HTML templating framework */
+const handlebars = require('express3-handlebars').create(
+  { defaultLayout: 'main'}
+);
+app.engine('handlebars', handlebars.engine);
+app.set('view engine', 'handlebars');
+
 app.set('port', process.env.PORT || 3000);
+
+app.get('/', (req, res) => {
+  res.type('text/plain');
+  res.send('Meadowlark Travel');
+});
+
+app.get('/about', (req, res) => {
+  res.type('text/plain');
+  res.send('About Meadowlark Travel');
+});
 
 app.use((req, res) => {
   res.type('text/plain');
