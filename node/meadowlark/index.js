@@ -1,36 +1,34 @@
 const express = require('express');
+const path = require('path');
 const app = express();
 
 /* HTML templating framework */
 const handlebars = require('express3-handlebars').create(
-  { defaultLayout: 'main'}
+  { defaultLayout: 'main' }
 );
 app.engine('handlebars', handlebars.engine);
+app.set('views', path.join(__dirname, 'views/layouts/'));
 app.set('view engine', 'handlebars');
 
 app.set('port', process.env.PORT || 3000);
 
 app.get('/', (req, res) => {
-  res.type('text/plain');
-  res.send('Meadowlark Travel');
+  res.render('main');
 });
 
 app.get('/about', (req, res) => {
-  res.type('text/plain');
-  res.send('About Meadowlark Travel');
+  res.render('about');
 });
 
 app.use((req, res) => {
-  res.type('text/plain');
   res.status(404);
-  res.send('404 - not found');
+  res.render('404');
 });
 
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.type('text/plain');
   res.status(500);
-  res.send('500 - Server Error');
+  res.render('500');
 });
 
 app.listen(app.get('port'), () => {
