@@ -8,3 +8,5 @@ node_modules
 identidock/\.pytest_cache/
 
 identidock/app/tests/\.pytest_cache/
+
+*.beam
