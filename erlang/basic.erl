@@ -5,6 +5,7 @@
 % function to export, /1 means it has 1 parameter.
 -export([fib/1, factorial/1, double_all/1, another_double_all/1]).
 -export([count_words/1, count/1, report/1]).
+-export([super_animal/1]).
 
 mirror(Anything) -> Anything.
 
@@ -32,3 +33,10 @@ count(N) -> io:fwrite(" ~p~n", [N]), count(N - 1).
 
 report(success) -> io:fwrite("success");
 report({error, Message}) -> io:fwrite("error:  ~p~n", [Message]).
+
+super_animal(Animal) ->
+  case string:lowercase(Animal) of
+    "dog" -> underdog;
+    "cat" -> thundercat;
+    _ -> unknown
+  end.
