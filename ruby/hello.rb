@@ -20,7 +20,7 @@ fish_tree = Tree.new('Seafish',
 	[Tree.new('dorade'), Tree.new('salmon')]
 )
 
-puts 'Visiting a node'
+puts 'Visiting the current node'
 fish_tree.visit {|node| puts node.node_name}
 puts
 

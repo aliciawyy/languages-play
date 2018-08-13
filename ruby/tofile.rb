@@ -9,7 +9,7 @@ module ToFile
 end
 
 class Person
-    include ToFile
+    include ToFile # mixin
     attr_accessor :name
 
     def initialize(name)
@@ -21,4 +21,5 @@ class Person
     end
 end
 
+puts Person.superclass # Object
 Person.new('alice').to_f
