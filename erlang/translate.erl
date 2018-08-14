@@ -4,6 +4,7 @@
 % Example
 % Pid = spawn(fun translate:loop/0).
 % Pid ! "blanca".
+% Send the message "blanca" to the process Pid
 loop() ->
   receive % receive a message from another process
     "casa" ->
