@@ -10,7 +10,8 @@ likes(grommit, cheese).
 likes(wendy, pork).
 
 /*
- This statement is a rule
+ This statement is a rule not a fact.
+ 
  The symbol ":-", sometimes called a turnstile, is pronounced "if".
  \+ logic negation, e.g. \+(X = Y) means X is not equal to Y
  The rule will be true if all the subgoals are true.
