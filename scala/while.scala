@@ -31,3 +31,13 @@ def rubyStyleForLoop {
   args.foreach {println}
 }
 rubyStyleForLoop
+
+println("Exclusive range")
+('a' until 'e').foreach {println} // exclusive
+println("Inclusive range")
+('a' to 'e').foreach {println} // inclusive
+(10 to 0 by -5).foreach {println}
+
+// error if trying to access person._3
+val person = ("Elvis", "Soldier")
+println("Tuple example", person._1, person._2)
