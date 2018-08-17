@@ -19,3 +19,15 @@ def forLoop {
   }
 }
 forLoop
+
+def rubyStyleForLoopLambda {
+  println("for loop using Ruby-style iteration with lambda function")
+  args.foreach {a => println(a)}
+}
+rubyStyleForLoopLambda
+
+def rubyStyleForLoop {
+  println("for loop using Ruby-style iteration")
+  args.foreach {println}
+}
+rubyStyleForLoop
