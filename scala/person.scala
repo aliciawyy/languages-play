@@ -19,14 +19,17 @@ object Person {
   def hello = println("hello")
 }
 
+trait Nice {
+  def greet() = println("Howdily doodily")
+}
+
 class Employee(override val firstName: String,
-                        val number: Int) extends Person(firstName) {
+                        val number: Int) extends Person(firstName) with Nice {
   override def talk(message: String) = println(
     firstName + " with number " + number + " says " + message
   )
   override def id(): String = number.toString
 }
-
 
 // tests
 Person.hello
@@ -47,3 +50,4 @@ println("kate's id is " + kate.id)
 val employee = new Employee("Clair", 31234)
 employee.talk("Nice to meet you")
 println("Clair's id is " + employee.id)
+employee.greet
