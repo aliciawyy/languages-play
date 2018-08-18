@@ -20,6 +20,10 @@ object Person {
 }
 
 trait Nice {
+  /*
+  A result type of _Unit_ indicates the fucntion returns no interesting
+  value
+  */
   def greet() = println("Howdily doodily")
 }
 
