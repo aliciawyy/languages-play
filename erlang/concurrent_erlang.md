@@ -2,6 +2,9 @@
 
 Erlang's concurrency is based on message passing and the actor model (processes-based concurrency).
 
+When you send a message to an actor, you place an object on its queue, the actor reads the message
+and takes action.
+
 ## Concurrency vs Parallelism
 In many places both words refer to the same concept, but in the context of Erlang
 

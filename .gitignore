@@ -10,3 +10,7 @@ identidock/\.pytest_cache/
 identidock/app/tests/\.pytest_cache/
 
 *.beam
+
+scala/target/
+
+scala/project/target/
