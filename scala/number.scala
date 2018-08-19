@@ -16,3 +16,12 @@ println("Range 0..5 double = ")
 
 def max(x: Int, y: Int) = if (x > y) x else y
 println("max(1, 4) = " + max(1, 4))
+
+val priceList = List(10, 2, 5, 11)
+println("Scala higher order function exploration")
+println("original list: " + priceList)
+println(priceList find { price => price > 5 })
+println(priceList filter { _ > 5 })
+println(priceList map { _ * 2 })
+println(priceList reduce { (a, b) => a + b })
+println(priceList.sum)

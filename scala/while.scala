@@ -29,6 +29,8 @@ rubyStyleForLoopLambda
 def rubyStyleForLoop {
   println("for loop using Ruby-style iteration")
   args.foreach {println}
+  println("With even more scala simplification")
+  args foreach println
 }
 rubyStyleForLoop
 
