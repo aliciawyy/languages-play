@@ -11,19 +11,29 @@ In many places both words refer to the same concept, but in the context of Erlan
 - _concurrency_ refers to the idea of having many actors running independently, but not necessarily all at the same time.
 - _parallelism_ is having many actors running exactly at the same time.
 
+Concurrent programs in Erlang are made from sets of communicating sequential processes.
+
 ### Actor vs Thread
 - An _actor_ changes its own state and accesses other actors only through closely controlled queue.
 - _Threads_ ca change each other's state without restriction.
 -
 
 ### Erlang process
-An Erlang _process_ is not an operating process but a lightweight process that is managed by the Erlang system. All the Erlang processes execute concurrently and independently.
+
+An Erlang _process_ is not an operating process but a lightweight process that is managed by the Erlang system. It is the basic unit of concurrency. All the Erlang processes execute concurrently and independently.
 
 In Erlang, processes share no memory and can interact only with each other by sending messages.
+
+At runtime the Erlang virtual machine automatically distributes the execution of processes over the available CPUs.
 
 **Analogy with OOP**
 
 Modules in Erlang are like classes and processes are like objects in OOP.
+
+**Fault tolerance**
+
+Erlang programs are made up of many small independent processes. Errors in one process cannot accidentally crash another process.
+
 
 ## Three primitives for Erlang concurrency
 
@@ -35,7 +45,7 @@ Modules in Erlang are like classes and processes are like objects in OOP.
 The following lines shows an example that Joe wants to say hello to Susan
 
 ```
-Susan ! { self(), "Hello from Joe"}
+Susan ! { self(), "Hello from Joe" }
 ```
 
 The syntax `Pid ! Message` means send the `Message` to the process `Pid`.
