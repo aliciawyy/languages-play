@@ -16,7 +16,6 @@ Concurrent programs in Erlang are made from sets of communicating sequential pro
 ### Actor vs Thread
 - An _actor_ changes its own state and accesses other actors only through closely controlled queue.
 - _Threads_ ca change each other's state without restriction.
--
 
 ### Erlang process
 
