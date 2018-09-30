@@ -8,7 +8,7 @@ defmodule Meteo.Worker do
     end
   end
 
-  defp url(location) do
+  def url(location) do
     location = URI.encode(location)
     "http://api.openweathermap.org/data/2.5/weather?q=#{location}&appid=#{apikey()}"
   end
@@ -34,7 +34,7 @@ defmodule Meteo.Worker do
       temperature = (json["main"]["temp"] - 273.15) |> Float.round(1)
       {:ok, temperature}
     rescue
-      _ -> :error
+      _ -> {:error, "unable to compute the temperature from #{json}"}
     end
   end
 end
