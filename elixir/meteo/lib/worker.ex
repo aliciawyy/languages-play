@@ -29,11 +29,13 @@ defmodule Meteo.Worker do
   end
 
   def handle_call(:get_stats, _from, stats), do: {:reply, stats, stats}
+
   def handle_call({:location, location}, _from, stats) do
     case temperature(location) do
       {:ok, temp} ->
         new_stats = update_stats(stats, location)
         {:reply, "#{temp} C", new_stats}
+
       _ ->
         {:reply, :error, stats}
     end
@@ -54,14 +56,14 @@ defmodule Meteo.Worker do
   def handle_cast(:stop, stats), do: {:stop, :normal, stats}
 
   def handle_info(msg, stats) do
-    IO.puts "received #{msg}"
+    IO.puts("received #{msg}")
     {:noreply, stats}
   end
 
   # Helper functions
 
   def temperature(location) do
-    url(location) |> HTTPoison.get |> parse_response
+    url(location) |> HTTPoison.get() |> parse_response()
   end
 
   def url(location) do
@@ -70,19 +72,21 @@ defmodule Meteo.Worker do
   end
 
   defp parse_response({:ok, %HTTPoison.Response{body: body, status_code: 200}}) do
-    body |> JSON.decode! |> compute_temperature
+    body |> JSON.decode!() |> compute_temperature()
   end
+
   defp parse_response({:ok, %HTTPoison.Response{body: body, status_code: 401}}) do
     {:error, JSON.decode!(body)["message"]}
   end
+
   defp parse_response(_), do: {:error, "unknown error"}
 
   defp apikey do
     # file format: cdaaedafra
     "~/.config/openweathermap.apikey"
-    |> Path.expand
-    |> File.read!
-    |> String.trim
+    |> Path.expand()
+    |> File.read!()
+    |> String.trim()
   end
 
   defp compute_temperature(json) do
