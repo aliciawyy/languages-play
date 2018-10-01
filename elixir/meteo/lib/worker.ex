@@ -1,19 +1,54 @@
 defmodule Meteo.Worker do
+  use GenServer
 
-  def loop do
-    receive do
-      {sender, location} -> send(sender, {:ok, temperature(location)})
-      _ -> IO.puts "Don't know how to process the message"
-    end
-    loop()
+  def start_link(opts \\ []) do
+    GenServer.start_link(__MODULE__, :ok, opts)
   end
 
-  def temperature(location) do
-    result = url(location) |> HTTPoison.get |> parse_response
-    case result do
-      {:ok, temperature} -> "#{location}: #{temperature} C"
-      {:error, reason} -> "#{location} not found for #{reason}"
+  def init(:ok) do
+    {:ok, %{}}
+  end
+
+  def update_stats(old_stats, location) do
+    if Map.has_key?(old_stats, location) do
+      Map.update!(old_stats, location, &(&1 + 1))
+    else
+      Map.put_new(old_stats, location, 1)
     end
+  end
+
+  def get_stats(pid) do
+    GenServer.call(pid, :get_stats)
+  end
+
+  def get_temperature(pid, location) do
+    GenServer.call(pid, {:location, location})
+  end
+
+  def handle_call(:get_stats, _from, stats), do: {:reply, stats, stats}
+  def handle_call({:location, location}, _from, stats) do
+    case temperature(location) do
+      {:ok, temp} ->
+        new_stats = update_stats(stats, location)
+        {:reply, "#{temp} C", new_stats}
+      _ ->
+        {:reply, :error, stats}
+    end
+  end
+
+  # GenServer.cast/2 sets up asynchronous requests to the server. A good
+  # usecase of this is a command issued to the server and the client does
+  # not care about the reply, like reset the stats
+  def reset_stats(pid) do
+    GenServer.cast(pid, :reset_stats)
+  end
+
+  def handle_cast(:reset_stats, _stats), do: {:noreply, %{}}
+
+  # Helper functions
+
+  def temperature(location) do
+    url(location) |> HTTPoison.get |> parse_response
   end
 
   def url(location) do
