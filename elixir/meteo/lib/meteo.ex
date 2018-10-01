@@ -13,7 +13,7 @@ defmodule Meteo do
 
   """
   def temperature(cities) do
-    coordinator_pid = spawn(Meteo.Coordinator, :loop, [[], Enum.count(cities)])
+    coordinator_pid = spawn(Meteo.Coordinator, :loop, [Enum.count(cities)])
     cities
     |> Enum.each(fn city ->
       worker_pid = spawn(Meteo.Worker, :loop, [])
