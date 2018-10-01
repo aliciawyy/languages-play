@@ -1,5 +1,13 @@
 defmodule Meteo.Worker do
 
+  def loop do
+    receive do
+      {sender, location} -> send(sender, {:ok, temperature(location)})
+      _ -> IO.puts "Don't know how to process the message"
+    end
+    loop()
+  end
+
   def temperature(location) do
     result = url(location) |> HTTPoison.get |> parse_response
     case result do
