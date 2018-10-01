@@ -1,8 +1,11 @@
 defmodule Meteo.Worker do
   use GenServer
 
+  # register a name for the GenServer
+  @name MW
+
   def start_link(opts \\ []) do
-    GenServer.start_link(__MODULE__, :ok, opts)
+    GenServer.start_link(__MODULE__, :ok, opts ++ [name: @name])
   end
 
   def init(:ok) do
@@ -17,12 +20,12 @@ defmodule Meteo.Worker do
     end
   end
 
-  def get_stats(pid) do
-    GenServer.call(pid, :get_stats)
+  def get_stats do
+    GenServer.call(@name, :get_stats)
   end
 
-  def get_temperature(pid, location) do
-    GenServer.call(pid, {:location, location})
+  def get_temperature(location) do
+    GenServer.call(@name, {:location, location})
   end
 
   def handle_call(:get_stats, _from, stats), do: {:reply, stats, stats}
@@ -39,11 +42,21 @@ defmodule Meteo.Worker do
   # GenServer.cast/2 sets up asynchronous requests to the server. A good
   # usecase of this is a command issued to the server and the client does
   # not care about the reply, like reset the stats
-  def reset_stats(pid) do
-    GenServer.cast(pid, :reset_stats)
+  def reset_stats do
+    GenServer.cast(@name, :reset_stats)
+  end
+
+  def stop do
+    GenServer.cast(@name, :stop)
   end
 
   def handle_cast(:reset_stats, _stats), do: {:noreply, %{}}
+  def handle_cast(:stop, stats), do: {:stop, :normal, stats}
+
+  def handle_info(msg, stats) do
+    IO.puts "received #{msg}"
+    {:noreply, stats}
+  end
 
   # Helper functions
 
