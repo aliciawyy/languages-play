@@ -1,6 +1,11 @@
 defmodule Ring do
   @moduledoc """
   The Ring module links a list of processes in a ring.
+
+  If one of the linked processes died, none of them will survive.
+
+  If you don't want a process to die when it receives an error signal, you need
+  the process to *trap exit signals*.
   """
 
   def create_processes(n) do
@@ -12,7 +17,13 @@ defmodule Ring do
       {:link, link_to} when is_pid(link_to) ->
         Process.link(link_to)
         loop()
+      :trap_exit ->
+        Process.flag(:trap_exit, true)
+        loop()
       :crash -> 1/0
+      {:EXIT, pid, reason} ->
+        IO.puts "#{inspect self()} received {:EXIT, #{inspect pid}, #{reason}}"
+        loop()
     end
   end
 
