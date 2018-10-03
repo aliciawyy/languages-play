@@ -29,7 +29,7 @@ defmodule Pooly do
   return it to the pool with checkin
   """
   def checkin(worker_pid) do
-    Pooly.Server.checkin(pid)
+    Pooly.Server.checkin(worker_pid)
   end
 
   @doc """

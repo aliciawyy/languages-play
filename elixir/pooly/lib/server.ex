@@ -3,7 +3,7 @@ defmodule Pooly.Server do
   import Supervisor.Spec
 
   defmodule State do
-    defstruct sup: nil, size: nil, mfa: nil, worker_sup: nil, workers: nil
+    defstruct sup: nil, size: nil, mfa: nil, worker_sup: nil, workers: nil, monitors: nil
   end
 
   def start_link(sup, pool_config) do
@@ -13,10 +13,10 @@ defmodule Pooly.Server do
   # sup is the pid to the top-level supervisor
   def init([sup, pool_config]) when is_pid(sup) do
     monitors = :ets.new(:monitors, [:private])
-    init(pool_config, %State{sup: sup})
+    init(pool_config, %State{sup: sup, monitors: monitors})
   end
 
-  def init([mfa: mfa, size: size | _], state) do
+  def init([mfa: mfa, size: size], state) do
     state = %{state | mfa: mfa, size: size}
     send(self(), :start_worker_supervisor)
     {:ok, state}
@@ -65,7 +65,7 @@ defmodule Pooly.Server do
   end
 
   def handle_cast({:checkin, worker_pid}, %{workers: workers, monitors: monitors} = state) do
-    case :ets.lookup(monitors, worker) do
+    case :ets.lookup(monitors, worker_pid) do
       [{pid, ref}] ->
         true = Process.demonitor(ref)
         true = :ets.delete(monitors, pid)
