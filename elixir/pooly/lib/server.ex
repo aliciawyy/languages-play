@@ -12,6 +12,7 @@ defmodule Pooly.Server do
 
   # sup is the pid to the top-level supervisor
   def init([sup, pool_config]) when is_pid(sup) do
+    monitors = :ets.new(:monitors, [:private])
     init(pool_config, %State{sup: sup})
   end
 
@@ -43,9 +44,9 @@ defmodule Pooly.Server do
     worker
   end
 
-  def checkout do
-    GenServer.call(__MODULE__, :checkout)
-  end
+  def checkout, do: GenServer.call(__MODULE__, :checkout)
+  def status, do: GenServer.call(__MODULE__, :status)
+  def checkin(worker_pid), do: GenServer.cast(__MODULE__, {:checkin, worker_pid})
 
   def handle_call(:checkout, {from_pid, _ref}, %{workers: workers, monitors: monitors} = state) do
     case workers do
@@ -54,8 +55,21 @@ defmodule Pooly.Server do
         true = :ets.insert(monitors, {worker, ref})
         {:reply, worker, %{state | workers: rest}}
 
+      [] -> {:reply, :noproc, state}
+    end
+  end
+  def handle_call(:status, %{workers: workers, monitors: monitors} = state) do
+    {:reply, {length(workers), :ets.info(monitors, :size)}, state}
+  end
+
+  def handle_cast({:checkin, worker_pid}, %{workers: workers, monitors: monitors} = state) do
+    case :ets.lookup(monitors, worker) do
+      [{pid, ref}] ->
+        true = Process.demonitor(ref)
+        true = :ets.delete(monitors, pid)
+        {:noreply, %{state | workers: [pid | workers]}}
       [] ->
-        {:reply, :noproc, state}
+        {:noreply, state}
     end
   end
 end

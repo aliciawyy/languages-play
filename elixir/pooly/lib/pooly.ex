@@ -3,12 +3,16 @@ defmodule Pooly do
   Documentation for Pooly.
   """
 
+  def start(_type, _args) do
+    pool_config = [mfa: {SampleWorker, :start_link, []}, size: 5]
+    start_pool(pool_config)
+  end
+
   @doc """
-  Starts a pool of the
+  Starts a pool of workers
   """
-  def start_pool(mfa: mfa, size: size) do
-    IO.puts(mfa)
-    IO.puts(size)
+  def start_pool(pool_config) do
+    Pooly.Supervisor.start_link(pool_config)
   end
 
   @doc """
@@ -17,6 +21,7 @@ defmodule Pooly do
   :noproc is returned when no more worker available
   """
   def checkout do
+    Pooly.Server.checkout
   end
 
   @doc """
@@ -24,11 +29,13 @@ defmodule Pooly do
   return it to the pool with checkin
   """
   def checkin(worker_pid) do
+    Pooly.Server.checkin(pid)
   end
 
   @doc """
   {Number of free workers, number of busy workers}
   """
   def status do
+    Pooly.Server.status
   end
 end

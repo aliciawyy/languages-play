@@ -37,6 +37,6 @@ defmodule Pooly.WorkerSupervisor do
       max_seconds: 5
     ]
 
-    supervisor(children, opts)
+    supervise(children, opts)
   end
 end
