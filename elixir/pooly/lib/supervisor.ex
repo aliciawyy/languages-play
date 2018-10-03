@@ -2,7 +2,7 @@ defmodule Pooly.Supervisor do
   @moduledoc """
   Top-level supervisor
   """
-  
+
   use Supervisor
 
   def start_link(pool_config) do

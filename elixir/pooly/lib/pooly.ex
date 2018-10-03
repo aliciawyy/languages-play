@@ -21,7 +21,7 @@ defmodule Pooly do
   :noproc is returned when no more worker available
   """
   def checkout do
-    Pooly.Server.checkout
+    Pooly.Server.checkout()
   end
 
   @doc """
@@ -36,6 +36,6 @@ defmodule Pooly do
   {Number of free workers, number of busy workers}
   """
   def status do
-    Pooly.Server.status
+    Pooly.Server.status()
   end
 end

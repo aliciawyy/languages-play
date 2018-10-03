@@ -55,9 +55,11 @@ defmodule Pooly.Server do
         true = :ets.insert(monitors, {worker, ref})
         {:reply, worker, %{state | workers: rest}}
 
-      [] -> {:reply, :noproc, state}
+      [] ->
+        {:reply, :noproc, state}
     end
   end
+
   def handle_call(:status, %{workers: workers, monitors: monitors} = state) do
     {:reply, {length(workers), :ets.info(monitors, :size)}, state}
   end
@@ -68,6 +70,7 @@ defmodule Pooly.Server do
         true = Process.demonitor(ref)
         true = :ets.delete(monitors, pid)
         {:noreply, %{state | workers: [pid | workers]}}
+
       [] ->
         {:noreply, state}
     end
