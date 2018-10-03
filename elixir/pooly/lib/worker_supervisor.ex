@@ -8,7 +8,7 @@ defmodule Pooly.WorkerSupervisor do
   @doc """
 
   ## Restart Strategy
-  
+
   A restart strategy indicate how a Supervisor restarts a child
   when it goes wrong. There are four kinds of restart strategies:
 
@@ -21,6 +21,11 @@ defmodule Pooly.WorkerSupervisor do
                 restarted together.
   :simple_one_for_one For this strategy, every child process spawned from
                       the Supervisor is the same kind of process.
+
+  ## Other options
+
+  max_restarts, max_seconds: max number of restarts the Supervisor can try
+  withing the maximum seconds
   """
   def init({m, f, a}) do
     worker_opts = [restart: :permanent, function: f]
