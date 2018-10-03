@@ -1,0 +1,45 @@
+defmodule Pooly.Server do
+  use GenServer
+  import Supervisor.Spec
+
+  defmodule State do
+    defstruct sup: nil, size: nil, mfa: nil, worker_sup: nil, workers: nil
+  end
+
+  def start_link(sup, pool_config) do
+    GenServer.start_link(__MODULE__, [sup, pool_config], name: __MODULE__)
+  end
+
+  # sup is the pid to the top-level supervisor
+  def init([sup, pool_config]) when is_pid(sup) do
+    init(pool_config, %State{sup: sup})
+  end
+
+  def init([(mfa: mfa, size: size) | _], state) do
+    state = %{state | mfa: mfa, size: size}
+    send(self(), :start_worker_supervisor)
+    {:ok, state}
+  end
+
+  def handle_info(:start_worker_supervisor, state = %State{
+    sup: sup, size: size, mfa: mfa}) do
+      # start the worker supervisor process via the top level Supervisor
+      {:ok, worker_sup} = Supervisor.start_child(sup, supervisor_spec(mfa))
+      workers = prepopulate(size, worker_sup)
+      {:noreply, %{state | worker_sup: worker_sup, workers: workers}}
+  end
+
+  defp supervisor_spec(mfa) do
+    # The top-level supervisor won't restart automatically the worker
+    # supervisor
+    supervisor(Pooly.WorkerSupervisor, [mfa], restart: :temporary)
+  end
+
+  defp prepopulate(size, sup) do
+    1..size |> Enum.map(fn _ -> new_worker(sup) end)
+  end
+  defp new_worker(sup) do
+    {:ok, worker} = Supervisor.start_child(sup, [[]])
+    worker
+  end
+end
