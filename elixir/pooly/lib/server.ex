@@ -11,6 +11,7 @@ defmodule Pooly.Server do
   end
 
   # sup is the pid to the top-level supervisor
+  @impl true
   def init([sup, pool_config]) when is_pid(sup) do
     monitors = :ets.new(:monitors, [:private])
     init(pool_config, %State{sup: sup, monitors: monitors})
@@ -22,6 +23,7 @@ defmodule Pooly.Server do
     {:ok, state}
   end
 
+  @impl true
   def handle_info(:start_worker_supervisor, state = %State{sup: sup, size: size, mfa: mfa}) do
     # start the worker supervisor process via the top level Supervisor
     {:ok, worker_sup} = Supervisor.start_child(sup, supervisor_spec(mfa))
@@ -44,10 +46,7 @@ defmodule Pooly.Server do
     worker
   end
 
-  def checkout, do: GenServer.call(__MODULE__, :checkout)
-  def status, do: GenServer.call(__MODULE__, :status)
-  def checkin(worker_pid), do: GenServer.cast(__MODULE__, {:checkin, worker_pid})
-
+  @impl true
   def handle_call(:checkout, {from_pid, _ref}, %{workers: workers, monitors: monitors} = state) do
     case workers do
       [worker | rest] ->
@@ -60,10 +59,12 @@ defmodule Pooly.Server do
     end
   end
 
-  def handle_call(:status, %{workers: workers, monitors: monitors} = state) do
+  @impl true
+  def handle_call(:status, {_, _ref}, %{workers: workers, monitors: monitors} = state) do
     {:reply, {length(workers), :ets.info(monitors, :size)}, state}
   end
 
+  @impl true
   def handle_cast({:checkin, worker_pid}, %{workers: workers, monitors: monitors} = state) do
     case :ets.lookup(monitors, worker_pid) do
       [{pid, ref}] ->
