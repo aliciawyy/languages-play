@@ -13,6 +13,7 @@ defmodule Pooly.Server do
   # sup is the pid to the top-level supervisor
   @impl true
   def init([sup, pool_config]) when is_pid(sup) do
+    Process.flag(:trap_exit, true)
     monitors = :ets.new(:monitors, [:private])
     init(pool_config, %State{sup: sup, monitors: monitors})
   end
@@ -26,6 +27,19 @@ defmodule Pooly.Server do
   @impl true
   def handle_info(:start_worker_supervisor, state = %State{sup: sup, size: size, mfa: mfa}) do
     # start the worker supervisor process via the top level Supervisor
+    {:ok, worker_sup} = Supervisor.start_child(sup, supervisor_spec(mfa))
+    workers = prepopulate(size, worker_sup)
+    {:noreply, %{state | worker_sup: worker_sup, workers: workers}}
+  end
+  def handle_info({:DOWN, ref, _, _, _}, state = %State{monitors: monitors, workers: workers}) do
+    case :ets.match(monitors, {:"$1", ref}) do
+      [[pid]] ->
+        :ets.delete(monitors, pid)
+        new_state = %{state | workers: [pid|workers]}
+        {:noreply, new_state}
+      [[]] ->
+        {:noreply, state}
+    end
     {:ok, worker_sup} = Supervisor.start_child(sup, supervisor_spec(mfa))
     workers = prepopulate(size, worker_sup)
     {:noreply, %{state | worker_sup: worker_sup, workers: workers}}
