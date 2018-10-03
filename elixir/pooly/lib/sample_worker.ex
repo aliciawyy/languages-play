@@ -5,6 +5,10 @@ defmodule SampleWorker do
     GenServer.start_link(__MODULE__, :ok, [])
   end
 
+  def stop(pid) do
+    GenServer.call(pid, :stop)
+  end
+
   @impl true
   def init(:ok) do
     {:ok, %{}}

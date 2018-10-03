@@ -21,7 +21,7 @@ defmodule Pooly do
   :noproc is returned when no more worker available
   """
   def checkout do
-    GenServer.call(Pooly.Server, :checkout)
+    Pooly.Server.checkout()
   end
 
   @doc """
@@ -29,13 +29,13 @@ defmodule Pooly do
   return it to the pool with checkin
   """
   def checkin(worker_pid) do
-    GenServer.cast(Pooly.Server, {:checkin, worker_pid})
+    Pooly.Server.checkin(worker_pid)
   end
 
   @doc """
   {Number of free workers, number of busy workers}
   """
   def status do
-    GenServer.call(Pooly.Server, :status)
+    Pooly.Server.status()
   end
 end

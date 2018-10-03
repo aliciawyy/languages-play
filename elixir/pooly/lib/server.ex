@@ -46,6 +46,10 @@ defmodule Pooly.Server do
     worker
   end
 
+  def checkout, do: GenServer.call(__MODULE__, :checkout)
+  def status, do: GenServer.call(__MODULE__, :status)
+  def checkin(worker_pid), do: GenServer.cast(__MODULE__, {:checkin, worker_pid})
+
   @impl true
   def handle_call(:checkout, {from_pid, _ref}, %{workers: workers, monitors: monitors} = state) do
     case workers do
@@ -58,9 +62,7 @@ defmodule Pooly.Server do
         {:reply, :noproc, state}
     end
   end
-
-  @impl true
-  def handle_call(:status, {_, _ref}, %{workers: workers, monitors: monitors} = state) do
+  def handle_call(:status, {_from_pid, _ref}, %{workers: workers, monitors: monitors} = state) do
     {:reply, {length(workers), :ets.info(monitors, :size)}, state}
   end
 
