@@ -15,18 +15,17 @@ defmodule Pooly.Server do
     init(pool_config, %State{sup: sup})
   end
 
-  def init([(mfa: mfa, size: size) | _], state) do
+  def init([mfa: mfa, size: size | _], state) do
     state = %{state | mfa: mfa, size: size}
     send(self(), :start_worker_supervisor)
     {:ok, state}
   end
 
-  def handle_info(:start_worker_supervisor, state = %State{
-    sup: sup, size: size, mfa: mfa}) do
-      # start the worker supervisor process via the top level Supervisor
-      {:ok, worker_sup} = Supervisor.start_child(sup, supervisor_spec(mfa))
-      workers = prepopulate(size, worker_sup)
-      {:noreply, %{state | worker_sup: worker_sup, workers: workers}}
+  def handle_info(:start_worker_supervisor, state = %State{sup: sup, size: size, mfa: mfa}) do
+    # start the worker supervisor process via the top level Supervisor
+    {:ok, worker_sup} = Supervisor.start_child(sup, supervisor_spec(mfa))
+    workers = prepopulate(size, worker_sup)
+    {:noreply, %{state | worker_sup: worker_sup, workers: workers}}
   end
 
   defp supervisor_spec(mfa) do
@@ -38,8 +37,25 @@ defmodule Pooly.Server do
   defp prepopulate(size, sup) do
     1..size |> Enum.map(fn _ -> new_worker(sup) end)
   end
+
   defp new_worker(sup) do
     {:ok, worker} = Supervisor.start_child(sup, [[]])
     worker
+  end
+
+  def checkout do
+    GenServer.call(__MODULE__, :checkout)
+  end
+
+  def handle_call(:checkout, {from_pid, _ref}, %{workers: workers, monitors: monitors} = state) do
+    case workers do
+      [worker | rest] ->
+        ref = Process.monitor(from_pid)
+        true = :ets.insert(monitors, {worker, ref})
+        {:reply, worker, %{state | workers: rest}}
+
+      [] ->
+        {:reply, :noproc, state}
+    end
   end
 end

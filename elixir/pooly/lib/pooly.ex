@@ -7,8 +7,8 @@ defmodule Pooly do
   Starts a pool of the
   """
   def start_pool(mfa: mfa, size: size) do
-    IO.puts mfa
-    IO.puts size
+    IO.puts(mfa)
+    IO.puts(size)
   end
 
   @doc """
