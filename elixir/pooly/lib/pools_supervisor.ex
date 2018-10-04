@@ -1,11 +1,12 @@
 defmodule Pooly.PoolsSupervisor do
   use Supervisor
 
-  def start_link(_) do
-    Supervisor.start_link(__MODULE__, :ok, [])
+  def start_link do
+    Supervisor.start_link(__MODULE__, [], name: __MODULE__)
   end
 
+  @impl true
   def init(_) do
-    {:ok, %{}}
+    supervise([], strategy: :one_for_one)
   end
 end
