@@ -1,8 +1,8 @@
 defmodule Pooly.WorkerSupervisor do
-  use Supervisor
+  use DynamicSupervisor
 
-  def start_link({_, _, _} = mfa) do
-    Supervisor.start_link(__MODULE__, mfa)
+  def start_link(pool_server) do
+    DynamicSupervisor.start_link(__MODULE__, pool_server)
   end
 
   @doc """
@@ -20,23 +20,21 @@ defmodule Pooly.WorkerSupervisor do
                 after the process. They will die with the process then
                 restarted together.
   :simple_one_for_one For this strategy, every child process spawned from
-                      the Supervisor is the same kind of process.
+                      the Supervisor is the same kind of process. (deprecated)
 
   ## Other options
 
   max_restarts, max_seconds: max number of restarts the Supervisor can try
   withing the maximum seconds
   """
-  def init({m, f, a}) do
-    worker_opts = [restart: :permanent, function: f]
-    children = [worker(m, a, worker_opts)]
-
+  @impl true
+  def init(pool_server) do
     opts = [
-      strategy: :simple_one_for_one,
+      strategy: :one_for_one,
       max_restarts: 5,
       max_seconds: 5
     ]
 
-    supervise(children, opts)
+    DynamicSupervisor.init(opts)
   end
 end

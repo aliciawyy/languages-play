@@ -2,15 +2,20 @@ defmodule Pooly.PoolSupervisor do
   use Supervisor
 
   def start_link(pool_config) do
-    opts = [name: :"#{pool_config[:name]}Supervisor"]
+    opts = [name: name(pool_config[:name])]
 
-    GenServer.start_link(__MODULE__, pool_config, opts)
+    Supervisor.start_link(__MODULE__, pool_config, opts)
   end
+
+  def name(pool_name), do: :"#{pool_name}Supervisor"
 
   @impl true
   def init(pool_config) do
     children = [
-      %{start: {Pooly.PoolServer, :start_link, [self(), pool_config]}}
+      %{
+        id: Pooly.PoolServer.name(pool_config[:name]),
+        start: {Pooly.PoolServer, :start_link, [self(), pool_config]}
+      }
     ]
 
     opts = [strategy: :one_for_all]

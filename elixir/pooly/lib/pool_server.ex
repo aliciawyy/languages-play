@@ -29,10 +29,11 @@ defmodule Pooly.PoolServer do
   end
 
   @impl true
-  def handle_info(:start_worker_supervisor, state = %State{sup: sup, size: size, mfa: mfa}) do
+  def handle_info(:start_worker_supervisor,
+      state = %State{sup: sup, size: size, mfa: mfa, name: pool_name}) do
     # start the worker supervisor process via the top level Supervisor
-    {:ok, worker_sup} = Supervisor.start_child(sup, supervisor_spec(mfa))
-    workers = prepopulate(size, worker_sup)
+    {:ok, worker_sup} = Supervisor.start_child(sup, supervisor_spec(pool_name))
+    workers = prepopulate(size, worker_sup, mfa)
     {:noreply, %{state | worker_sup: worker_sup, workers: workers}}
   end
 
@@ -50,13 +51,13 @@ defmodule Pooly.PoolServer do
 
   def handle_info(
         {:EXIT, pid, _reason},
-        state = %State{monitors: monitors, workers: workers, worker_sup: worker_sup}
+        state = %State{monitors: monitors, workers: workers, worker_sup: worker_sup, mfa: mfa}
       ) do
     case :ets.lookup(monitors, pid) do
       [{pid, ref}] ->
         true = Process.demonitor(ref)
         true = :ets.delete(monitors, pid)
-        new_state = %{state | workers: [new_worker(worker_sup) | workers]}
+        new_state = %{state | workers: [new_worker(worker_sup, mfa) | workers]}
         {:noreply, new_state}
 
       [[]] ->
@@ -64,19 +65,20 @@ defmodule Pooly.PoolServer do
     end
   end
 
-  defp supervisor_spec(mfa) do
+  defp supervisor_spec(pool_name) do
     %{
-      start: {Pooly.WorkerSupervisor, :start_link, [mfa]},
+      id: :"#{pool_name}WorkerSupervisor",
+      start: {Pooly.WorkerSupervisor, :start_link, [self()]},
       restart: :temporary
     }
   end
 
-  defp prepopulate(size, sup) do
-    1..size |> Enum.map(fn _ -> new_worker(sup) end)
+  defp prepopulate(size, sup, mfa) do
+    1..size |> Enum.map(fn _ -> new_worker(sup, mfa) end)
   end
 
-  defp new_worker(sup) do
-    {:ok, worker} = Supervisor.start_child(sup, [[]])
+  defp new_worker(sup, {m, _, _} = mfa) do
+    {:ok, worker} = DynamicSupervisor.start_child(sup, m)
     worker
   end
 

@@ -22,7 +22,7 @@ defmodule Pooly.Server do
 
   defp child_spec(pool_config) do
     %{
-      id: Pooly.PoolServer.name(pool_config[:name]),
+      id: Pooly.PoolSupervisor.name(pool_config[:name]),
       start: {Pooly.PoolSupervisor, :start_link, [pool_config]}
     }
   end
