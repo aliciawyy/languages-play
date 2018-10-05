@@ -29,18 +29,18 @@ defmodule Pooly.Server do
   end
 
   def checkout(pool_name) do
-    GenServer.call(__MODULE__, {:checkout, server_name(pool_name)})
+    GenServer.call(server_name(pool_name), :checkout)
   end
 
   def checkin(pool_name, worker) do
+    GenServer.call(server_name(pool_name, {:checkin, worker}))
   end
 
   def status(pool_name) do
+    GenServer.call(server_name(pool_name), :status)
   end
 
-  defp server_name(pool_name) do
-    :"#{pool_name}Server"
-  end
+  defp server_name(pool_name), do: :"#{pool_name}Server"
 
   @impl true
   def handle_call({:checkout, server_name}, {from_pid, _ref}, state) do

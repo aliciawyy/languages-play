@@ -15,6 +15,8 @@ defmodule Pooly.Supervisor do
       worker(Pooly.Server, [pools_config])
     ]
 
-    supervise(children, strategy: :one_for_all)
+    opts = [strategy: :one_for_all]
+
+    supervise(children, opts)
   end
 end
