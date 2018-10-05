@@ -1,13 +1,17 @@
 defmodule Pooly.PoolServer do
   use GenServer
-  import Supervisor.Spec
 
   defmodule State do
-    defstruct sup: nil, size: nil, mfa: nil, worker_sup: nil, workers: nil, monitors: nil
+    defstruct sup: nil, size: nil, mfa: nil, worker_sup: nil, workers: nil,
+      monitors: nil, name: nil
   end
 
+  def name(pool_name), do: :"#{pool_name}Server"
+
   def start_link(sup, pool_config) do
-    GenServer.start_link(__MODULE__, [sup, pool_config], name: __MODULE__)
+    opts = [name: name(pool_config[:name])]
+
+    GenServer.start_link(__MODULE__, [sup, pool_config], opts)
   end
 
   # sup is the pid to the top-level supervisor
@@ -18,8 +22,8 @@ defmodule Pooly.PoolServer do
     init(pool_config, %State{sup: sup, monitors: monitors})
   end
 
-  def init([mfa: mfa, size: size], state) do
-    state = %{state | mfa: mfa, size: size}
+  def init([name: pool_name, mfa: mfa, size: size], state) do
+    state = %{state | mfa: mfa, size: size, name: pool_name}
     send(self(), :start_worker_supervisor)
     {:ok, state}
   end
@@ -61,9 +65,10 @@ defmodule Pooly.PoolServer do
   end
 
   defp supervisor_spec(mfa) do
-    # The top-level supervisor won't restart automatically the worker
-    # supervisor
-    supervisor(Pooly.WorkerSupervisor, [mfa], restart: :temporary)
+    %{
+      start: {Pooly.WorkerSupervisor, :start_link, [mfa]},
+      restart: :temporary
+    }
   end
 
   defp prepopulate(size, sup) do

@@ -8,13 +8,12 @@ defmodule Pooly.Server do
   @impl true
   def init(pools_config) do
     pools_config
-    |> Enum.each(fn pool_config ->
-      send(self(), {:start_pool, pool_config})
-    end)
+    |> Enum.each(fn pool_config -> send(self(), {:start_pool, pool_config}) end)
 
     {:ok, pools_config}
   end
 
+  @impl true
   def handle_info({:start_pool, pool_config}, state) do
     {:ok, _} = Supervisor.start_child(Pooly.PoolsSupervisor, child_spec(pool_config))
 
@@ -23,26 +22,20 @@ defmodule Pooly.Server do
 
   defp child_spec(pool_config) do
     %{
-      id: server_name(pool_config[:name]),
+      id: Pooly.PoolServer.name(pool_config[:name]),
       start: {Pooly.PoolSupervisor, :start_link, [pool_config]}
     }
   end
 
   def checkout(pool_name) do
-    GenServer.call(server_name(pool_name), :checkout)
+    GenServer.call(Pooly.PoolServer.name(pool_name), :checkout)
   end
 
   def checkin(pool_name, worker) do
-    GenServer.call(server_name(pool_name, {:checkin, worker}))
+    GenServer.call(Pooly.PoolServer.name(pool_name), {:checkin, worker})
   end
 
   def status(pool_name) do
-    GenServer.call(server_name(pool_name), :status)
-  end
-
-  defp server_name(pool_name), do: :"#{pool_name}Server"
-
-  @impl true
-  def handle_call({:checkout, server_name}, {from_pid, _ref}, state) do
+    GenServer.call(Pooly.PoolServer.name(pool_name), :status)
   end
 end
