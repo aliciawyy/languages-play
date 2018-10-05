@@ -67,8 +67,8 @@ defmodule Pooly.PoolServer do
 
   defp supervisor_spec(pool_name) do
     %{
-      id: :"#{pool_name}WorkerSupervisor",
-      start: {Pooly.WorkerSupervisor, :start_link, [self()]},
+      id: Pooly.WorkerSupervisor.name(pool_name),
+      start: {Pooly.WorkerSupervisor, :start_link, [pool_name]},
       restart: :temporary
     }
   end
@@ -77,8 +77,8 @@ defmodule Pooly.PoolServer do
     1..size |> Enum.map(fn _ -> new_worker(sup, mfa) end)
   end
 
-  defp new_worker(sup, {m, _, _} = mfa) do
-    {:ok, worker} = DynamicSupervisor.start_child(sup, m)
+  defp new_worker(sup, mfa) do
+    {:ok, worker} = DynamicSupervisor.start_child(sup, mfa)
     worker
   end
 

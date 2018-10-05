@@ -5,10 +5,12 @@ defmodule Pooly do
   use Application
 
   def start(_type, _args) do
+    worker_spec = {SampleWorker, []}
+
     pools_config = [
-      [name: "Pool1", mfa: {SampleWorker, :start_link, []}, size: 2],
-      [name: "Pool2", mfa: {SampleWorker, :start_link, []}, size: 3],
-      [name: "Pool3", mfa: {SampleWorker, :start_link, []}, size: 4]
+      [name: "Pool1", mfa: worker_spec, size: 2],
+      [name: "Pool2", mfa: worker_spec, size: 3],
+      [name: "Pool3", mfa: worker_spec, size: 4]
     ]
 
     start_pools(pools_config)
