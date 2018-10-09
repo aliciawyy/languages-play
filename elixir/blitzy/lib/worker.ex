@@ -2,6 +2,10 @@ defmodule Blitzy.Worker do
   use Timex
   require Logger
 
+  def start(url, caller) do
+    send(caller, {self(), start(url)})
+  end
+
   def start(url) do
     {time_lapsed, response} = Duration.measure(fn -> HTTPoison.get(url) end)
     handle_response({Duration.to_milliseconds(time_lapsed), response})
