@@ -10,4 +10,12 @@ defmodule Blitzy.WorkerTest do
     {:error, reason} = Blitzy.Worker.start("errorurlnotexist")
     assert reason == %HTTPoison.Error{id: nil, reason: :nxdomain}
   end
+
+  test "worker with send" do
+    Blitzy.Worker.start("errorurlnotexist", self())
+    receive do
+      {_from, {:error, reason}} ->
+        assert reason == %HTTPoison.Error{id: nil, reason: :nxdomain}
+    end
+  end
 end
