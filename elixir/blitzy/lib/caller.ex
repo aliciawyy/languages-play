@@ -4,7 +4,10 @@ defmodule Blitzy.Caller do
 
     1..n_workers
     |> Enum.map(fn _ -> spawn(fn -> Blitzy.Worker.start(url, me) end) end)
-    |> Enum.map(fn _ -> receive do x -> x end end)
+    |> Enum.map(fn _ ->
+      receive do
+        x -> x
+      end
+    end)
   end
-
 end
