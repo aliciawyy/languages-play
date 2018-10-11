@@ -3,16 +3,26 @@ defmodule Chucky do
   Documentation for Chucky.
   """
 
-  @doc """
-  Hello world.
+  use Application
+  require Logger
 
-  ## Examples
+  def start(type, _args) do
+    case type do
+      :normal ->
+        Logger.info("Application is started on #{node()}.")
+      {:takeover, old_node} ->
+        Logger.info("#{node()} is taking over #{old_node}.")
+      {:failover, old_node} ->
+        Logger.info("#{old_node} is failing over to #{node()}.")
+    end
 
-      iex> Chucky.hello()
-      :world
+    opts = [strategy: :one_for_one, name: {:global, :"Chucky.Supervisor"}]
 
-  """
-  def hello do
-    :world
+    Supervisor.start_link([Chucky.Server], opts)
   end
+
+  def fact do
+    Chucky.Server.fact
+  end
+
 end
