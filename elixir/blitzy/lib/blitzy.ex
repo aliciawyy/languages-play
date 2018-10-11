@@ -1,4 +1,10 @@
 defmodule Blitzy do
+  use Application
+
+  def start(_type, _args) do
+    Blitzy.Supervisor.start_link(:ok)
+  end
+
   def run_and_report(n_workers, url) do
     run(n_workers, url) |> parse_result
   end
@@ -11,7 +17,7 @@ defmodule Blitzy do
     |> Enum.map(&Task.await(&1))
   end
 
-  defp parse_result(result) do
+  def parse_result(result) do
     {successes, _failures} =
       result
       |> Enum.split_with(fn x ->
