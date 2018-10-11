@@ -14,7 +14,7 @@ defmodule Blitzy do
 
     1..n_workers
     |> Enum.map(fn _ -> Task.async(worker_fun) end)
-    |> Enum.map(&Task.await(&1))
+    |> Enum.map(&Task.await(&1, :infinity))
   end
 
   def parse_result(result) do

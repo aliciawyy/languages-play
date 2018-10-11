@@ -14,3 +14,5 @@ identidock/app/tests/\.pytest_cache/
 scala/target/
 
 scala/project/target/
+
+elixir/blitzy/blitzy
