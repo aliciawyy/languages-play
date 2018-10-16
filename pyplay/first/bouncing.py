@@ -1,5 +1,3 @@
-import sys
-import time
 import pygame
 
 
@@ -30,46 +28,53 @@ class Player(pygame.sprite.Sprite):
         return hitbox.colliderect(target_rect)
 
 
-pygame.init()
-pygame.display.set_caption("Ping Pong")
-pygame.mouse.set_visible(False)
+def main():
+    pygame.init()
+    pygame.display.set_caption("Ping Pong")
+    pygame.mouse.set_visible(False)
 
-speed = [2, 2]
-black = 0, 0, 0
+    speed = [2, 2]
+    black = 0, 0, 0
 
-screen = pygame.display.set_mode(SCREENRECT.size)
+    screen = pygame.display.set_mode(SCREENRECT.size)
+    clock = pygame.time.Clock()
 
-ball = pygame.image.load("eight-ball-5.png")
-ball_rect = ball.get_rect(midtop=SCREENRECT.midtop)
+    ball = pygame.image.load("eight-ball-5.png")
+    ball_rect = ball.get_rect(midtop=SCREENRECT.midtop)
 
-player = Player()
+    player = Player()
 
-while player.alive():
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            sys.exit(1)
+    while player.alive():
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                import sys
+                sys.exit(1)
 
-    ball_rect = ball_rect.move(speed)
-    if ball_rect.left < 0 or ball_rect.right > SCREENRECT.width:
-        speed[0] = - speed[0]
-    if ball_rect.bottom < 25:
-        speed[1] = - speed[1]
+        ball_rect = ball_rect.move(speed)
+        if ball_rect.left < 0 or ball_rect.right > SCREENRECT.width:
+            speed[0] = - speed[0]
+        if ball_rect.bottom < 25:
+            speed[1] = - speed[1]
 
-    key_state_ = pygame.key.get_pressed()
-    player.move(key_state_)
-    if player.hit(ball_rect):
-        speed[1] = - speed[1]
+        key_state_ = pygame.key.get_pressed()
+        player.move(key_state_)
+        if player.hit(ball_rect):
+            speed[1] = - speed[1]
 
-    screen.fill(black)
-    screen.blit(player.image, player.rect)
+        if ball_rect.bottom > SCREENRECT.height - 25:
+            explosion = pygame.image.load("mine-explosion-20.png")
+            ball = explosion
+            player.kill()
 
-    if ball_rect.bottom > SCREENRECT.height - 25:
-        explosion = pygame.image.load("mine-explosion-20.png")
-        screen.blit(explosion, ball_rect)
-        pygame.display.flip()
-        time.sleep(2)
-        player.kill()
-    else:
+        ball_rect = ball_rect.clamp(SCREENRECT)
+
+        screen.fill(black)
+        screen.blit(player.image, player.rect)
         screen.blit(ball, ball_rect)
+
         pygame.display.flip()
-        time.sleep(.02)
+        clock.tick(60)
+
+
+if __name__ == "__main__":
+    main()
