@@ -16,3 +16,5 @@ scala/target/
 scala/project/target/
 
 elixir/blitzy/blitzy
+
+pyplay/examples/__pycache__/
