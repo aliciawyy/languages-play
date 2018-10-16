@@ -1,6 +1,7 @@
 import pygame
 
-
+BLACK = 0, 0, 0
+GREEN = 0, 255, 0
 SCREENRECT = pygame.Rect(0, 0, 640, 480)
 
 
@@ -31,12 +32,10 @@ class Player(pygame.sprite.Sprite):
 def main():
     pygame.init()
     pygame.display.set_caption("Ping Pong")
+    screen = pygame.display.set_mode(SCREENRECT.size)
+
     pygame.mouse.set_visible(False)
 
-    speed = [2, 2]
-    black = 0, 0, 0
-
-    screen = pygame.display.set_mode(SCREENRECT.size)
     clock = pygame.time.Clock()
 
     ball = pygame.image.load("eight-ball-5.png")
@@ -44,12 +43,14 @@ def main():
 
     player = Player()
 
+    speed = [2, 2]
+
     while player.alive():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                import sys
-                sys.exit(1)
+                return
 
+        # Game Logic
         ball_rect = ball_rect.move(speed)
         if ball_rect.left < 0 or ball_rect.right > SCREENRECT.width:
             speed[0] = - speed[0]
@@ -63,17 +64,20 @@ def main():
 
         if ball_rect.bottom > SCREENRECT.height - 25:
             explosion = pygame.image.load("mine-explosion-20.png")
+            ball_rect = ball_rect.move([0, -50])
             ball = explosion
             player.kill()
 
-        ball_rect = ball_rect.clamp(SCREENRECT)
-
-        screen.fill(black)
+        # Drawing
+        screen.fill(BLACK)
         screen.blit(player.image, player.rect)
         screen.blit(ball, ball_rect)
 
+        # Update the screen
         pygame.display.flip()
         clock.tick(60)
+
+    pygame.quit()
 
 
 if __name__ == "__main__":
