@@ -31,6 +31,8 @@ class Player(pygame.sprite.Sprite):
 
 
 pygame.init()
+pygame.display.set_caption("Ping Pong")
+pygame.mouse.set_visible(False)
 
 speed = [2, 2]
 black = 0, 0, 0
@@ -70,4 +72,4 @@ while player.alive():
     else:
         screen.blit(ball, ball_rect)
         pygame.display.flip()
-        time.sleep(.01)
+        time.sleep(.02)
