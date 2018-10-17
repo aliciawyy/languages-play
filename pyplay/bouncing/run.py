@@ -9,7 +9,7 @@ class Player(pygame.sprite.Sprite):
 
     def __init__(self):
         super(Player, self).__init__(pygame.sprite.RenderUpdates())
-        self.image = pygame.image.load("i-brick-25.png")
+        self.image = pygame.image.load("img/i-brick-25.png")
         self.rect = self.image.get_rect(midbottom=SCREENRECT.midbottom)
         self.speed = 10
 
@@ -31,14 +31,14 @@ class Player(pygame.sprite.Sprite):
 
 def main():
     pygame.init()
-    pygame.display.set_caption("Ping Pong")
+    pygame.display.set_caption("Bouncing")
     screen = pygame.display.set_mode(SCREENRECT.size)
 
     pygame.mouse.set_visible(False)
 
     clock = pygame.time.Clock()
 
-    ball = pygame.image.load("eight-ball-5.png")
+    ball = pygame.image.load("img/eight-ball-5.png")
     ball_rect = ball.get_rect(midtop=SCREENRECT.midtop)
 
     player = Player()
@@ -63,7 +63,7 @@ def main():
             speed[1] = - speed[1]
 
         if ball_rect.bottom > SCREENRECT.height - 25:
-            explosion = pygame.image.load("mine-explosion-20.png")
+            explosion = pygame.image.load("img/mine-explosion-20.png")
             ball_rect = ball_rect.move([0, -50])
             ball = explosion
             player.kill()
