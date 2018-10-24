@@ -2,7 +2,7 @@ import pygame
 
 BLACK = 0, 0, 0
 GREEN = 0, 255, 0
-SCREENRECT = pygame.Rect(0, 0, 640, 480)
+SCREENRECT = pygame.Rect(0, 0, 720, 600)
 
 
 class Player(pygame.sprite.Sprite):

@@ -105,7 +105,7 @@ class Alien(pygame.sprite.Sprite):
     def update(self):
         self.rect.move_ip(self.facing, 0)
         if not SCREENRECT.contains(self.rect):
-            self.facing = -self.facing;
+            self.facing = -self.facing
             self.rect.top = self.rect.bottom + 1
             self.rect = self.rect.clamp(SCREENRECT)
         self.frame = self.frame + 1
